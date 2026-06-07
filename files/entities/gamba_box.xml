@@ -1,0 +1,50 @@
+<Entity name="gamba_box" tags="gamba_box,item_physics,effectable_prop">
+  <PositionSeedComponent>
+  </PositionSeedComponent>
+
+  <PhysicsBodyComponent
+    _tags="enabled_in_world"
+    uid="1"
+    allow_sleep="1"
+    angular_damping="0"
+    fixed_rotation="0"
+    is_bullet="1"
+    linear_damping="0"
+    auto_clean="1"
+    hax_fix_going_through_ground="1"
+    on_death_leave_physics_body="0"
+    on_death_really_leave_body="0">
+  </PhysicsBodyComponent>
+
+  <PhysicsImageShapeComponent
+    body_id="1"
+    centered="1"
+    image_file="data/buildings_gfx/chest_random.png"
+    material="wood_prop">
+  </PhysicsImageShapeComponent>
+
+  <SpriteComponent
+    _tags="gamba_cost_display,enabled_in_world"
+    image_file="data/fonts/font_pixel_white.xml"
+    is_text_sprite="1"
+    offset_x="7"
+    offset_y="15"
+    update_transform="1"
+    update_transform_rotation="0"
+    text="0"
+    z_index="-1">
+  </SpriteComponent>
+
+  <InteractableComponent
+    _enabled="1"
+    radius="18"
+    ui_text="Open Gamba Box"
+    name="Gamba Box"
+    exclusivity_group="1">
+  </InteractableComponent>
+
+  <LuaComponent
+    _enabled="1"
+    script_interacting="mods/gamba_box/files/scripts/gamba_box.lua">
+  </LuaComponent>
+</Entity>
