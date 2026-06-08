@@ -36,7 +36,7 @@ GAMBA_CHEST_TIERS = {
   },
   [2] = {
     name = "Tier 2 Chest",
-    base_cost = 200,
+    base_cost = 400,
     cost_multiplier = 1.5,
     chances = {
       common = 50,

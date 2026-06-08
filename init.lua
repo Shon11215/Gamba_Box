@@ -6,18 +6,24 @@ local BOX_VISUAL_Y_OFFSET = -16
 local DEFAULT_CHEST_TIER = 1
 local HOLY_MOUNTAIN_SPAWN_CHECK_FRAMES = 60
 local HOLY_MOUNTAIN_REROLL_TAG = "perk_reroll_machine"
-local HOLY_MOUNTAIN_SPAWN_VERSION = 6
+local HOLY_MOUNTAIN_SPAWN_VERSION = 7
+local HOLY_MOUNTAIN_COUNTER_GLOBAL = "GAMBA_BOX_HOLY_MOUNTAIN_COUNT"
 local HOLY_MOUNTAIN_CHEST_X_OFFSET = -152
 local HOLY_MOUNTAIN_FLOOR_SAMPLE_X_OFFSET = -105
 local HOLY_MOUNTAIN_CHEST_Y_OFFSET = -29
 local HOLY_MOUNTAIN_CHEST_RAY_START_Y_OFFSET = -48
 local HOLY_MOUNTAIN_CHEST_RAY_END_Y_OFFSET = 96
-local CHEST_TIER_2_START_Y = 4100
-local CHEST_TIER_3_START_Y = 7200
-local CHEST_TIER_4_START_Y = 11200
-local FIRST_HOLY_MOUNTAIN_COST = 100
-local FIRST_HOLY_MOUNTAIN_COST_END_Y = 3000
 local EXISTING_HOLY_MOUNTAIN_CHEST_RADIUS = 260
+
+local HOLY_MOUNTAIN_CHEST_SEQUENCE = {
+  { tier = 1, cost = 100 },
+  { tier = 1, cost = 200 },
+  { tier = 2, cost = 400 },
+  { tier = 2, cost = 400 },
+  { tier = 3, cost = 800 },
+  { tier = 3, cost = 800 },
+  { tier = 4, cost = 1600 },
+}
 
 -- Debug spawn is disabled for Workshop builds. Uncomment this block and the
 -- matching block in OnWorldPostUpdate to spawn test chests with L + number.
@@ -103,18 +109,18 @@ local function spawn_debug_gamba_box(chest_tier)
 end
 ]]
 
-local function get_holy_mountain_chest_tier(reroll_y)
-  if reroll_y < CHEST_TIER_2_START_Y then return 1 end
-  if reroll_y < CHEST_TIER_3_START_Y then return 2 end
-  if reroll_y < CHEST_TIER_4_START_Y then return 3 end
+local function get_next_holy_mountain_chest_data()
+  local spawned_count = tonumber(GlobalsGetValue(HOLY_MOUNTAIN_COUNTER_GLOBAL, "0")) or 0
+  local next_index = spawned_count + 1
+  local chest_data = HOLY_MOUNTAIN_CHEST_SEQUENCE[next_index] or HOLY_MOUNTAIN_CHEST_SEQUENCE[#HOLY_MOUNTAIN_CHEST_SEQUENCE]
 
-  return 4
+  GlobalsSetValue(HOLY_MOUNTAIN_COUNTER_GLOBAL, tostring(next_index))
+
+  return chest_data
 end
 
-local function get_holy_mountain_chest_cost_override(reroll_y)
-  if reroll_y < FIRST_HOLY_MOUNTAIN_COST_END_Y then return FIRST_HOLY_MOUNTAIN_COST end
-
-  return nil
+local function mark_next_holy_mountain_chest_used()
+  get_next_holy_mountain_chest_data()
 end
 
 local function get_holy_mountain_spawn_key(reroll_x, reroll_y)
@@ -146,19 +152,30 @@ local function try_spawn_holy_mountain_gamba_boxes()
   local rerolls = EntityGetWithTag(HOLY_MOUNTAIN_REROLL_TAG)
   if rerolls == nil then return end
 
+  table.sort(rerolls, function(a, b)
+    local _, ay = EntityGetTransform(a)
+    local _, by = EntityGetTransform(b)
+
+    return ay < by
+  end)
+
   for _, reroll in ipairs(rerolls) do
     local reroll_x, reroll_y = EntityGetTransform(reroll)
     local spawn_key = get_holy_mountain_spawn_key(reroll_x, reroll_y)
 
-    if GlobalsGetValue(spawn_key, "0") ~= "1" and not holy_mountain_chest_already_exists(reroll_x, reroll_y) then
-      local chest_x = reroll_x + HOLY_MOUNTAIN_CHEST_X_OFFSET
-      local floor_sample_x = reroll_x + HOLY_MOUNTAIN_FLOOR_SAMPLE_X_OFFSET
-      local chest_y = find_floor_y(floor_sample_x, reroll_y)
-      local chest_tier = get_holy_mountain_chest_tier(reroll_y)
-      local cost_override = get_holy_mountain_chest_cost_override(reroll_y)
+    if GlobalsGetValue(spawn_key, "0") ~= "1" then
+      if holy_mountain_chest_already_exists(reroll_x, reroll_y) then
+        mark_next_holy_mountain_chest_used()
+        GlobalsSetValue(spawn_key, "1")
+      else
+        local chest_x = reroll_x + HOLY_MOUNTAIN_CHEST_X_OFFSET
+        local floor_sample_x = reroll_x + HOLY_MOUNTAIN_FLOOR_SAMPLE_X_OFFSET
+        local chest_y = find_floor_y(floor_sample_x, reroll_y)
+        local chest_data = get_next_holy_mountain_chest_data()
 
-      spawn_gamba_box(chest_x, chest_y + HOLY_MOUNTAIN_CHEST_Y_OFFSET, chest_tier, cost_override)
-      GlobalsSetValue(spawn_key, "1")
+        spawn_gamba_box(chest_x, chest_y + HOLY_MOUNTAIN_CHEST_Y_OFFSET, chest_data.tier, chest_data.cost)
+        GlobalsSetValue(spawn_key, "1")
+      end
     end
   end
 end
