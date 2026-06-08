@@ -4,7 +4,7 @@ dofile_once("mods/gamba_box/files/scripts/spell_tiers.lua")
 local REWARD_TIERS = {
   common = {
     label = "COMMON",
-    spells = { tiers = { 0 , 1 }, amount_min = 1, amount_max = 1 },
+    spells = { tiers = { 0 , 1 }, amount_min = 1, amount_max = 2 },
     wands = {
       { kind = "no_shuffle", tiers = { 1 } },
       { kind = "random", tiers = { 2 } },
@@ -28,7 +28,7 @@ local REWARD_TIERS = {
   },
   epic = {
     label = "EPIC",
-    spells = { tiers = { 3, 4, 5 }, amount_min = 3, amount_max = 4 },
+    spells = { tiers = { 3, 4, 5 ,6}, amount_min = 3, amount_max = 4 },
     wands = {
       { kind = "no_shuffle", tiers = { 3, 4 } },
       { kind = "random", tiers = { 5 } },
@@ -36,7 +36,7 @@ local REWARD_TIERS = {
   },
   legendary = {
     label = "LEGENDARY",
-    spells = { tiers = { 5, 6 }, amount_min = 3, amount_max = 4 },
+    spells = { tiers = { 7 }, amount_min = 3, amount_max = 4 },
     wands = {
       { kind = "no_shuffle", tiers = { 6 } },
       { kind = "random", tiers = { 7 } },
@@ -44,7 +44,7 @@ local REWARD_TIERS = {
   },
   unique = {
     label = "UNIQUE",
-    spells = { tiers = { 5, 6 }, amount_min = 4, amount_max = 4 },
+    spells = { tiers = { 10}, amount_min = 4, amount_max = 4 },
     wands = {
       { kind = "no_shuffle", tiers = { 10 } },
     },
@@ -82,6 +82,8 @@ local BAD_ROLLS = {
 local BAD_ROLL_CHANCE_BY_CHEST_TIER = {
   [1] = 10,
   [2] = 10,
+  [3] = 10,
+
 }
 
 local BAD_ROLL_POLYMORPH_EFFECT = "data/entities/particles/polymorph_explosion.xml"
@@ -90,8 +92,11 @@ local CHEST_OPEN_SOUND_EVENT = "misc/chest_dark_open"
 
 local ROLL_GUI_SCRIPT = "mods/gamba_box/files/scripts/gamba_roll_gui.lua"
 local ROLL_DURATION_FRAMES = 310
-local ROLL_SLOT_COUNT = 30
-local ROLL_FINAL_INDEX = 24
+local ROLL_SLOT_COUNT = 36
+local ROLL_FINAL_INDEX_MIN = 22
+local ROLL_FINAL_INDEX_MAX = 30
+local ROLL_STOP_OFFSET_MIN = -14
+local ROLL_STOP_OFFSET_MAX = 14
 
 local function get_box_storage(box_entity, tag)
   return EntityGetFirstComponentIncludingDisabled(box_entity, "VariableStorageComponent", tag)
@@ -345,7 +350,7 @@ local function get_roll_label(reward)
   return tier_data.label
 end
 
-local function build_roll_slots(chest_type, chest_tier, final_reward)
+local function build_roll_slots(chest_type, chest_tier, final_reward, final_index)
   local labels = {}
   local rarities = {}
 
@@ -355,20 +360,23 @@ local function build_roll_slots(chest_type, chest_tier, final_reward)
     rarities[i] = reward.rarity
   end
 
-  labels[ROLL_FINAL_INDEX] = get_roll_label(final_reward)
-  rarities[ROLL_FINAL_INDEX] = final_reward.rarity
+  labels[final_index] = get_roll_label(final_reward)
+  rarities[final_index] = final_reward.rarity
 
   return table.concat(labels, "|"), table.concat(rarities, "|")
 end
 
 local function start_roll_animation(box_entity, x, y, chest_type, chest_tier, reward)
-  local labels, rarities = build_roll_slots(chest_type, chest_tier, reward)
+  local final_index = Random(ROLL_FINAL_INDEX_MIN, ROLL_FINAL_INDEX_MAX)
+  local stop_offset = Random(ROLL_STOP_OFFSET_MIN, ROLL_STOP_OFFSET_MAX)
+  local labels, rarities = build_roll_slots(chest_type, chest_tier, reward, final_index)
   local roll_entity = EntityCreateNew("gamba_box_roll")
   EntitySetTransform(roll_entity, x, y)
 
   add_roll_storage(roll_entity, "start_frame", "value_int", GameGetFrameNum())
   add_roll_storage(roll_entity, "duration_frames", "value_int", ROLL_DURATION_FRAMES)
-  add_roll_storage(roll_entity, "final_index", "value_int", ROLL_FINAL_INDEX)
+  add_roll_storage(roll_entity, "final_index", "value_int", final_index)
+  add_roll_storage(roll_entity, "roll_stop_offset", "value_float", stop_offset)
   add_roll_storage(roll_entity, "box_entity", "value_int", box_entity)
   add_roll_storage(roll_entity, "roll_world_x", "value_float", x)
   add_roll_storage(roll_entity, "roll_world_y", "value_float", y)

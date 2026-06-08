@@ -1702,7 +1702,6 @@ local SPELL_TIERS = {
       { id = "STATIC_TO_SAND", probability = 0.2, type = "ACTION_TYPE_MODIFIER" },
       { id = "SUMMON_WANDGHOST", probability = 0.1, type = "ACTION_TYPE_UTILITY" },
       { id = "TAU", probability = 1, type = "ACTION_TYPE_OTHER" },
-      { id = "TENTACLE_PORTAL", probability = 0.2, type = "ACTION_TYPE_PROJECTILE" },
       { id = "THUNDER_BLAST", probability = 0.1, type = "ACTION_TYPE_STATIC_PROJECTILE" },
       { id = "THUNDERBALL", probability = 0.2, type = "ACTION_TYPE_PROJECTILE" },
       { id = "TOUCH_ALCOHOL", probability = 0.4, type = "ACTION_TYPE_MATERIAL" },
