@@ -4,7 +4,7 @@ dofile_once("mods/gamba_box/files/scripts/spell_tiers.lua")
 local REWARD_TIERS = {
   common = {
     label = "COMMON",
-    spells = { tiers = { 0 , 1 }, amount_min = 1, amount_max = 2 },
+    spells = { tiers = { 0, 1 }, amount_min = 1, amount_max = 2 },
     wands = {
       { kind = "no_shuffle", tiers = { 1 } },
       { kind = "random", tiers = { 2 } },
@@ -28,7 +28,7 @@ local REWARD_TIERS = {
   },
   epic = {
     label = "EPIC",
-    spells = { tiers = { 3, 4, 5 ,6}, amount_min = 3, amount_max = 4 },
+    spells = { tiers = { 3, 4, 5, 6 }, amount_min = 3, amount_max = 4 },
     wands = {
       { kind = "no_shuffle", tiers = { 3, 4 } },
       { kind = "random", tiers = { 5 } },
@@ -44,7 +44,7 @@ local REWARD_TIERS = {
   },
   unique = {
     label = "UNIQUE",
-    spells = { tiers = { 10}, amount_min = 4, amount_max = 4 },
+    spells = { tiers = { 10 }, amount_min = 4, amount_max = 4 },
     wands = {
       { kind = "no_shuffle", tiers = { 10 } },
     },
@@ -83,7 +83,6 @@ local BAD_ROLL_CHANCE_BY_CHEST_TIER = {
   [1] = 10,
   [2] = 10,
   [3] = 10,
-
 }
 
 local BAD_ROLL_POLYMORPH_EFFECT = "data/entities/particles/polymorph_explosion.xml"
@@ -225,7 +224,6 @@ local function choose_spell_from_tiers(tiers)
           total_weight = total_weight + weight
           table.insert(weighted_spells, {
             id = spell.id,
-            tier = tier,
             weight = weight,
           })
         end
@@ -383,7 +381,6 @@ local function start_roll_animation(box_entity, x, y, chest_type, chest_tier, re
   add_roll_storage(roll_entity, "slot_labels", "value_string", labels)
   add_roll_storage(roll_entity, "slot_rarities", "value_string", rarities)
   add_roll_storage(roll_entity, "reward_type", "value_string", reward.reward_type)
-  add_roll_storage(roll_entity, "reward_rarity", "value_string", reward.rarity)
   add_roll_storage(roll_entity, "reward_title", "value_string", reward.title)
   add_roll_storage(roll_entity, "reward_description", "value_string", reward.description)
   add_roll_storage(roll_entity, "spell_ids", "value_string", table.concat(reward.spell_ids or {}, "|"))
@@ -426,6 +423,6 @@ local function open_box(box_entity, player_entity)
   end
 end
 
-function interacting(entity_who_interacted, entity_interacted, interactable_name)
+function interacting(entity_who_interacted, entity_interacted, _interactable_name)
   open_box(entity_interacted, entity_who_interacted)
 end

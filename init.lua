@@ -56,7 +56,7 @@ local function update_cost_display(entity_id, cost)
   end
 end
 
-local function configure_gamba_box(entity_id, x, y, chest_tier, cost_override)
+local function configure_gamba_box(entity_id, chest_tier, cost_override)
   local tier_data = GAMBA_CHEST_TIERS[chest_tier] or GAMBA_CHEST_TIERS[DEFAULT_CHEST_TIER]
   local cost = cost_override or tier_data.base_cost
 
@@ -73,13 +73,13 @@ end
 
 local function spawn_gamba_box(x, y, chest_tier, cost_override)
   local box = EntityLoad(GAMBA_BOX_PATH, x, y + BOX_VISUAL_Y_OFFSET)
-  configure_gamba_box(box, x, y, chest_tier, cost_override)
+  configure_gamba_box(box, chest_tier, cost_override)
 end
 
 --[[
 local function spawn_gamba_box_at_mouse(x, y, chest_tier)
   local box = EntityLoad(GAMBA_BOX_PATH, x, y)
-  configure_gamba_box(box, x, y, chest_tier)
+  configure_gamba_box(box, chest_tier)
 end
 
 local function get_held_debug_chest_tier()

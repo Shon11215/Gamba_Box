@@ -28,6 +28,12 @@ local WINNING_SLOT_INDEX = 3
 local GUI_ID_BASE = 8000
 local GUI_ID_STRIDE = 100
 local END_HOLD_FRAMES = 85
+local SLOT_GUI_Z = -20
+local TEXT_GUI_Z = -30
+local TEXT_SCALE = 0.62
+local TEXT_MIN_VISIBLE_RATIO = 0.6
+local TEXT_PADDING_X = 3
+local TEXT_ESTIMATED_CHAR_WIDTH = 4
 
 local function gui_id(entity_id, local_id)
   return GUI_ID_BASE + (entity_id * GUI_ID_STRIDE) + local_id
@@ -186,6 +192,33 @@ local function round(value)
   return math.floor(value + 0.5)
 end
 
+local function clip_text_to_visible_area(label, raw_text_x, visible_min_x, visible_max_x)
+  local visible_left = visible_min_x + TEXT_PADDING_X
+  local visible_right = visible_max_x - TEXT_PADDING_X
+  local text_x = raw_text_x
+  local clipped_label = label
+
+  if text_x < visible_left then
+    local hidden_pixels = visible_left - text_x
+    local skipped_chars = math.floor(hidden_pixels / TEXT_ESTIMATED_CHAR_WIDTH)
+
+    clipped_label = string.sub(clipped_label, skipped_chars + 1)
+    text_x = visible_left
+  end
+
+  local available_width = visible_right - text_x
+  local visible_chars = math.floor(available_width / TEXT_ESTIMATED_CHAR_WIDTH)
+  if visible_chars <= 0 then return nil end
+
+  if visible_chars < #clipped_label then
+    clipped_label = string.sub(clipped_label, 1, visible_chars)
+  end
+
+  if clipped_label == "" then return nil end
+
+  return round(text_x), clipped_label
+end
+
 local function draw_line(gui, entity_id, local_id, x, y, width, height)
   if width <= 0 or height <= 0 then return end
 
@@ -223,7 +256,6 @@ local function spawn_final_reward(entity_id, x, y)
   local reward_type = get_string(entity_id, "reward_type", "")
   local reward_title = get_string(entity_id, "reward_title", "GAMBA BOX")
   local reward_description = get_string(entity_id, "reward_description", "")
-  local box_entity = get_int(entity_id, "box_entity", 0)
 
   EntityLoad("data/entities/particles/image_emitters/chest_effect.xml", x, y)
 
@@ -298,8 +330,9 @@ local function draw_roll(gui, entity_id, elapsed, duration)
   local last_drawn_slot = math.min(#labels, math.ceil(scroll_position) + SLOT_COUNT + DEAD_ZONE_SLOTS)
   local visible_min_x = base_x
   local visible_max_x = base_x + total_width
+  local text_entries = {}
 
-  GuiZSet(gui, -20)
+  GuiZSet(gui, SLOT_GUI_Z)
 
   for slot_index = first_drawn_slot, last_drawn_slot do
     local label = trim_label(labels[slot_index] or "")
@@ -309,7 +342,7 @@ local function draw_roll(gui, entity_id, elapsed, duration)
     local slot_x = math.max(raw_slot_x, visible_min_x)
     local slot_right = math.min(raw_slot_x + SLOT_WIDTH, visible_max_x)
     local slot_width = slot_right - slot_x
-    local is_full_slot = raw_slot_x >= visible_min_x and (raw_slot_x + SLOT_WIDTH) <= visible_max_x
+    local is_text_visible = slot_width >= (SLOT_WIDTH * TEXT_MIN_VISIBLE_RATIO)
     local slot_alpha = 0.82
 
     if slot_width > 0 then
@@ -319,12 +352,29 @@ local function draw_roll(gui, entity_id, elapsed, duration)
 
       draw_slot_edges(gui, entity_id, slot_index, slot_x, base_y, slot_width)
 
-      if is_full_slot then
-        GuiOptionsAddForNextWidget(gui, GUI_OPTION.NoPositionTween)
-        GuiColorSetForNextWidget(gui, r, g, b, 1)
-        GuiText(gui, round(raw_slot_x + 3), base_y + 6, label, 0.62)
+      if is_text_visible then
+        local raw_text_x = raw_slot_x + TEXT_PADDING_X
+        local text_x, clipped_label = clip_text_to_visible_area(label, raw_text_x, visible_min_x, visible_max_x)
+
+        if text_x ~= nil then
+          table.insert(text_entries, {
+            x = text_x,
+            y = base_y + 6,
+            label = clipped_label,
+            r = r,
+            g = g,
+            b = b,
+          })
+        end
       end
     end
+  end
+
+  GuiZSet(gui, TEXT_GUI_Z)
+  for _, entry in ipairs(text_entries) do
+    GuiOptionsAddForNextWidget(gui, GUI_OPTION.NoPositionTween)
+    GuiColorSetForNextWidget(gui, entry.r, entry.g, entry.b, 1)
+    GuiText(gui, entry.x, entry.y, entry.label, TEXT_SCALE)
   end
 
   local pointer_x = base_x + ((WINNING_SLOT_INDEX - 1) * (SLOT_WIDTH + SLOT_GAP)) + (SLOT_WIDTH * 0.5) - 2
