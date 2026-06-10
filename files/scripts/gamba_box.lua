@@ -44,7 +44,7 @@ local REWARD_TIERS = {
   },
   unique = {
     label = "UNIQUE",
-    spells = { tiers = { 10 }, amount_min = 4, amount_max = 4 },
+    spells = { tiers = { 10 }, amount_min = 4, amount_max = 6 },
     wands = {
       { kind = "no_shuffle", tiers = { 10 } },
     },

@@ -1692,6 +1692,7 @@ local SPELL_TIERS = {
       { id = "RANDOM_PROJECTILE", probability = 0.5, type = "ACTION_TYPE_PROJECTILE" },
       { id = "RANDOM_SPELL", probability = 0.5, type = "ACTION_TYPE_OTHER" },
       { id = "RANDOM_STATIC_PROJECTILE", probability = 0.5, type = "ACTION_TYPE_STATIC_PROJECTILE" },
+      { id = "REGENERATION_FIELD", probability = 0.3, type = "ACTION_TYPE_STATIC_PROJECTILE" },
       { id = "SEA_MIMIC", probability = 0.2, type = "ACTION_TYPE_MATERIAL" },
       { id = "SIGMA", probability = 1, type = "ACTION_TYPE_OTHER" },
       { id = "SLOW_BUT_STEADY", probability = 0.4, type = "ACTION_TYPE_MODIFIER" },
@@ -3530,6 +3531,7 @@ local SPELL_TIERS = {
       { tier = 2, probability = 0.3, type = "ACTION_TYPE_STATIC_PROJECTILE" },
       { tier = 3, probability = 0.4, type = "ACTION_TYPE_STATIC_PROJECTILE" },
       { tier = 4, probability = 0.3, type = "ACTION_TYPE_STATIC_PROJECTILE" },
+      { tier = 10, probability = 0.3, type = "ACTION_TYPE_STATIC_PROJECTILE" },
     },
     ["REMOVE_BOUNCE"] = {
       { tier = 2, probability = 0.2, type = "ACTION_TYPE_MODIFIER" },
