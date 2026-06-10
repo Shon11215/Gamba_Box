@@ -1,7 +1,4 @@
--- Generated from unpacked Noita data/scripts/gun/gun_actions.lua.
--- Tier mechanics reference: https://noita.wiki.gg/wiki/Wand_and_Spell_Tiers
--- Includes normal spell tiers only: 0, 1, 2, 3, 4, 5, 6, 7, 10.
--- Data-only file for Gamba Box reward pools. Do not put roll logic here.
+
 
 local SPELL_TIERS = {
   by_tier = {

@@ -12,7 +12,7 @@ local REWARD_TIERS = {
   },
   uncommon = {
     label = "UNCOMMON",
-    spells = { tiers = { 1, 2 }, amount_min = 1, amount_max = 2 },
+    spells = { tiers = { 1, 2 }, amount_min = 2, amount_max = 2 },
     wands = {
       { kind = "no_shuffle", tiers = { 2 } },
       { kind = "random", tiers = { 3 } },
