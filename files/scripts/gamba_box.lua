@@ -90,7 +90,7 @@ local CHEST_OPEN_SOUND_BANK = "data/audio/Desktop/misc.bank"
 local CHEST_OPEN_SOUND_EVENT = "misc/chest_dark_open"
 
 local ROLL_GUI_SCRIPT = "mods/gamba_box/files/scripts/gamba_roll_gui.lua"
-local ROLL_DURATION_FRAMES = 310
+local ROLL_DURATION_FRAMES = 200
 local ROLL_SLOT_COUNT = 36
 local ROLL_FINAL_INDEX_MIN = 22
 local ROLL_FINAL_INDEX_MAX = 30
