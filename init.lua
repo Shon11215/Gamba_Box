@@ -53,6 +53,7 @@ local function update_cost_display(entity_id, cost)
   local cost_display = EntityGetFirstComponentIncludingDisabled(entity_id, "SpriteComponent", "gamba_cost_display")
   if cost_display ~= nil then
     ComponentSetValue2(cost_display, "text", tostring(cost))
+    ComponentSetValue2(cost_display, "alpha", 1)
   end
 end
 

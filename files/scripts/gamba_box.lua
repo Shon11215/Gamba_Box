@@ -135,10 +135,10 @@ local function update_cost_display(box_entity)
   end
 end
 
-local function set_cost_display_enabled(box_entity, enabled)
+local function set_cost_display_visible(box_entity, visible)
   local cost_display = EntityGetFirstComponentIncludingDisabled(box_entity, "SpriteComponent", "gamba_cost_display")
   if cost_display ~= nil then
-    EntitySetComponentIsEnabled(box_entity, cost_display, enabled)
+    ComponentSetValue2(cost_display, "alpha", visible and 1 or 0)
   end
 end
 
@@ -161,7 +161,6 @@ local function increase_chest_cost(box_entity)
   local next_cost = math.floor((current_cost * tier_data.cost_multiplier) + 0.5)
 
   ComponentSetValue2(cost_storage, "value_int", next_cost)
-  update_chest_label(box_entity)
 end
 
 local function try_pay(box_entity, player_entity)
@@ -181,7 +180,9 @@ local function try_pay(box_entity, player_entity)
   end
 
   ComponentSetValue2(wallet, "money", money - cost)
+  set_cost_display_visible(box_entity, false)
   increase_chest_cost(box_entity)
+  update_chest_label(box_entity)
   return true
 end
 
@@ -333,7 +334,6 @@ end
 
 local function disable_box_interaction(box_entity)
   add_roll_storage(box_entity, "gamba_rolling", "value_bool", true)
-  set_cost_display_enabled(box_entity, false)
 
   local interactable = EntityGetFirstComponentIncludingDisabled(box_entity, "InteractableComponent")
   if interactable ~= nil then

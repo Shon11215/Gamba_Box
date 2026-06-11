@@ -285,16 +285,20 @@ local function spawn_final_reward(entity_id, x, y)
   GamePrintImportant(reward_title, reward_description)
 end
 
+local function show_cost_display(box_entity)
+  local cost_display = EntityGetFirstComponentIncludingDisabled(box_entity, "SpriteComponent", "gamba_cost_display")
+  if cost_display == nil then return end
+
+  ComponentSetValue2(cost_display, "alpha", 1)
+end
+
 local function finish_box_roll(box_entity)
   local rolling_storage = EntityGetFirstComponentIncludingDisabled(box_entity, "VariableStorageComponent", "gamba_rolling")
   if rolling_storage ~= nil then
     EntityRemoveComponent(box_entity, rolling_storage)
   end
 
-  local cost_display = EntityGetFirstComponentIncludingDisabled(box_entity, "SpriteComponent", "gamba_cost_display")
-  if cost_display ~= nil then
-    EntitySetComponentIsEnabled(box_entity, cost_display, true)
-  end
+  show_cost_display(box_entity)
 
   local interactable = EntityGetFirstComponentIncludingDisabled(box_entity, "InteractableComponent")
   if interactable ~= nil then
